@@ -7,3 +7,18 @@
   tags:
     - nginx
 
+- name: Nginx Default sites-available updated
+  copy:
+    src: files/default
+    dest: /etc/nginx/sites-available/default
+  register: nginx_sites-available_default
+  tags:
+    - nginx
+
+- name: Nginx restarted
+  service:
+    name: nginx
+    starte: restarted
+  when: nginx_sites-available_default.changed
+  tags:
+    - nginx
