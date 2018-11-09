@@ -11,7 +11,7 @@
   copy:
     src: files/default
     dest: /etc/nginx/sites-available/default
-  register: nginx_sites-available_default
+  register: nginx_sites_available_default
   tags:
     - nginx
 
@@ -19,6 +19,6 @@
   service:
     name: nginx
     starte: restarted
-  when: nginx_sites-available_default.changed
+  when: nginx_sites_available_default.changed
   tags:
     - nginx
