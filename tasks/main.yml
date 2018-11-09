@@ -1,0 +1,9 @@
+---
+- name: Nginx package present
+  apt:
+    pkg: nginx-full
+    state: latest
+    update_cache: yes
+  tags:
+    - nginx
+
