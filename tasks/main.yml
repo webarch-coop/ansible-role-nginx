@@ -18,7 +18,7 @@
 - name: Nginx restarted
   service:
     name: nginx
-    starte: restarted
+    state: restarted
   when: nginx_sites_available_default.changed
   tags:
     - nginx
