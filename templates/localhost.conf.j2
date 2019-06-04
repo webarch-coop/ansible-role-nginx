@@ -1,0 +1,33 @@
+# {{ ansible_managed }}
+server {
+  listen 127.0.0.1:80;
+  server_name localhost;
+  root /var/www/localhost;
+  location /nginx_status {
+    stub_status on;
+    access_log off;
+    allow 127.0.0.1;
+    deny all;
+  }
+{% if munin_phpfpm and munin_phpfpm_socket %}      
+  location ~ ^/(status|ping)$ {
+    include fastcgi.conf;
+    fastcgi_pass unix:{{ munin_phpfpm_socket }};
+    allow stats_collector.localdomain;
+    allow watchdog.localdomain;
+    access_log off;
+    allow 127.0.0.1;
+    deny all;
+  }
+{% if munin_phpfpm and munin_opcache %}      
+  location ~ \.php$ {
+    include fastcgi.conf;
+    fastcgi_intercept_errors on;
+    fastcgi_pass unix:{{ munin_phpfpm_socket }};
+    access_log off;
+    allow 127.0.0.1;
+    deny all;
+  }
+{% endif %}
+}
+# vim: syntax=nginx

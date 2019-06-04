@@ -15,6 +15,17 @@
   tags:
     - nginx
 
+- name: Nginx localhost conf in place
+  template:
+    src: templates/localhost.conf.j2
+    dest: /etc/nginx/sites-available/localhost.conf
+
+- name: Nginx localhost enabled
+  file:
+    path: /etc/nginx/sites-enabled/localhost.conf
+    src: /etc/nginx/sites-available/localhost.conf
+    state: link
+
 - name: Nginx restarted
   service:
     name: nginx
