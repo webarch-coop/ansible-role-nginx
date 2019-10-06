@@ -33,3 +33,4 @@
   when: nginx_sites_available_default.changed
   tags:
     - nginx
+...
