@@ -3,7 +3,7 @@
   apt:
     pkg: nginx-full
     state: latest
-    update_cache: yes
+    update_cache: false
   tags:
     - nginx
 
@@ -19,12 +19,16 @@
   template:
     src: templates/localhost.conf.j2
     dest: /etc/nginx/sites-available/localhost.conf
+  tags:
+    - nginx
 
 - name: Nginx localhost enabled
   file:
     path: /etc/nginx/sites-enabled/localhost.conf
     src: /etc/nginx/sites-available/localhost.conf
     state: link
+  tags:
+    - nginx
 
 - name: Nginx restarted
   service:
