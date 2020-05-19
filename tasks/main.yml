@@ -2,7 +2,7 @@
 - name: Nginx package present
   apt:
     pkg: nginx-full
-    state: latest
+    state: present
     update_cache: false
   tags:
     - nginx
