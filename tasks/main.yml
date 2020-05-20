@@ -1,7 +1,7 @@
 ---
 - name: Nginx package present
   apt:
-    pkg: nginx-full
+    pkg: nginx-extras
     state: present
     update_cache: false
   tags:
