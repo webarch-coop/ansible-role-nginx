@@ -7,7 +7,7 @@
   tags:
     - nginx
 
-- name: Generate DH Parameters 
+- name: Generate DH Parameters
   openssl_dhparam:
     path: /etc/nginx/ssl_dhparam.pem
     size: 2048
