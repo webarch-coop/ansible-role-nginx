@@ -1,3 +1,5 @@
+# {{ ansible_managed }}
+
 user www-data;
 worker_processes auto;
 pid /run/nginx.pid;
@@ -31,8 +33,10 @@ http {
 	# SSL Settings
 	##
 
-	ssl_protocols TLSv1 TLSv1.1 TLSv1.2; # Dropping SSLv3, ref: POODLE
+	ssl_protocols TLSv1 TLSv1.1 TLSv1.2 {% if nginx_tls1_3 is defined %}{% if nginx_tls1_3 == true %}TLSv1.3{% endif %}{% endif %};
+        ssl_ciphers '{% if nginx_tls1_3 is defined %}{% if nginx_tls1_3 == true %}{{ nginx_cipher_suites_tls1_3 }}:{% endif %}{% endif %}{{ nginx_cipher_suites_tls1_2 }}:{{ nginx_cipher_suites_tls1_1 }}';
 	ssl_prefer_server_ciphers on;
+        ssl_dhparam /etc/nginx/ssl_dhparam.pem;
 
 	##
 	# Logging Settings
@@ -83,3 +87,5 @@ http {
 #		proxy      on;
 #	}
 #}
+
+# vim: syntax=nginx
