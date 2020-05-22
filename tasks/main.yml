@@ -7,6 +7,13 @@
   tags:
     - nginx
 
+- name: Generate DH Parameters 
+  openssl_dhparam:
+    path: /etc/nginx/ssl_dhparam.pem
+    size: 2048
+  tags:
+    - nginx
+
 - name: Nginx Default sites-available updated
   copy:
     src: files/default
