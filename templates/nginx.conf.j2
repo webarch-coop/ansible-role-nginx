@@ -36,7 +36,7 @@ http {
 	ssl_protocols {% if nginx_tls1_1 is defined %}{% if nginx_tls1_1 == true %}TLSv1 TLSv1.1 {% endif %}{% endif %}TLSv1.2{% if nginx_tls1_3 is defined %}{% if nginx_tls1_3 == true %} TLSv1.3{% endif %}{% endif %};
         ssl_ciphers '{% if nginx_tls1_3 is defined %}{% if nginx_tls1_3 == true %}{{ nginx_cipher_suites_tls1_3 }}:{% endif %}{% endif %}{{ nginx_cipher_suites_tls1_2 }}{% if nginx_tls1_1 is defined %}{% if nginx_tls1_1 == true %}:{{ nginx_cipher_suites_tls1_1 }}{% endif %}{% endif %}';
 	ssl_prefer_server_ciphers on;
-        ssl_dhparam /etc/nginx/ssl_dhparam.pem;
+        ssl_dhparam {{ nginx_dhparam_path | default('/etc/nginx/ssl_dhparam.pem') }};
 
 	##
 	# Logging Settings
