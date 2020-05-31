@@ -40,7 +40,7 @@ server {
 	#
 	# include snippets/snakeoil.conf;
 
-{% if nginx_default_root is defined and if nginx_default_root is string %}
+{% if nginx_default_root is defined %}
 	root {{ nginx_default_root }};
 {% else %}
 	root /var/www/html;
@@ -58,7 +58,7 @@ server {
 
 	location / {
         # Redirect all HTTP requests to HTTPS with a 301 Moved Permanently response.
-{% if nginx_default_https_redirect is defined and if nginx_default_https_redirect is string %}
+{% if nginx_default_https_redirect is defined %}
 		return 301 {{ nginx_default_https_redirect }};
 {% else %}
 		return 301 https://$host$request_uri;
