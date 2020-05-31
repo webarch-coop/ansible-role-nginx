@@ -1,4 +1,6 @@
-##
+#
+# {{ ansible_managed }}
+#
 # You should look at the following URL's in order to grasp a solid understanding
 # of Nginx configuration files in order to fully unleash the power of Nginx.
 # https://www.nginx.com/resources/wiki/start/
@@ -38,7 +40,11 @@ server {
 	#
 	# include snippets/snakeoil.conf;
 
+{% if nginx_default_root is defined and if nginx_default_root is string %}
+	root {{ nginx_default_root }};
+{% else %}
 	root /var/www/html;
+{% endif %}
 
 	# Add index.php to the list if you are using PHP
 	index index.html index.htm index.nginx-debian.html;
@@ -52,7 +58,11 @@ server {
 
 	location / {
         # Redirect all HTTP requests to HTTPS with a 301 Moved Permanently response.
+{% if nginx_default_https_redirect is defined and if nginx_default_https_redirect is string %}
+		return 301 {{ nginx_default_https_redirect }};
+{% else %}
 		return 301 https://$host$request_uri;
+{% endif %}
 	}
 
 	#location / {
@@ -99,3 +109,5 @@ server {
 #		try_files $uri $uri/ =404;
 #	}
 #}
+#
+# vim: syntax=nginx

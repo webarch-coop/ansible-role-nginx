@@ -1,55 +1,62 @@
 ---
-- name: Nginx package present
-  apt:
-    pkg: nginx-extras
-    state: present
-    update_cache: false
-  tags:
-    - nginx
+- name: Install nginx-extras and do some basic configuration
+  block:
 
-- name: Generate DH Parameters
-  openssl_dhparam:
-    path: "{{ nginx_dhparam_path | default('/etc/nginx/ssl_dhparam.pem') }}"
-    size: "{{ nginx_dhparam_size | default('4096') }}"
-  tags:
-    - nginx
+    - name: Nginx package present
+      apt:
+        pkg: "{{ pkg }}"
+        state: present
+        update_cache: false
+      loop: "{{ nginx_packages }}"
+      loop_control:
+        loop_var: pkg
 
-- name: Nginx conf in place
-  template:
-    src: nginx.conf.j2
-    dest: /etc/nginx/nginx.conf
-  register: nginx_conf
-  tags:
-    - nginx
+    - name: Generate DH Parameters
+      openssl_dhparam:
+        path: "{{ nginx_dhparam_path | default('/etc/nginx/ssl_dhparam.pem') }}"
+        size: "{{ nginx_dhparam_size | default('4096') }}"
+      notify: Restart nginx
 
-- name: Nginx Default sites-available updated
-  copy:
-    src: files/default
-    dest: /etc/nginx/sites-available/default
-  register: nginx_sites_available_default
-  tags:
-    - nginx
+    - name: Nginx conf in place
+      template:
+        src: nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+      register: nginx_conf
+      notify: Restart nginx
 
-- name: Nginx localhost conf in place
-  template:
-    src: templates/localhost.conf.j2
-    dest: /etc/nginx/sites-available/localhost.conf
-  tags:
-    - nginx
+    - name: Nginx default sites-enabled absent
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      notify: Restart nginx
 
-- name: Nginx localhost enabled
-  file:
-    path: /etc/nginx/sites-enabled/localhost.conf
-    src: /etc/nginx/sites-available/localhost.conf
-    state: link
-  tags:
-    - nginx
+    - name: Nginx default.conf sites-available present
+      template:
+        src: default.conf.j2
+        dest: /etc/nginx/sites-available/default.conf
+      register: nginx_sites_available_default
+      notify: Restart nginx
 
-- name: Nginx restarted
-  service:
-    name: nginx
-    state: restarted
-  when: nginx_conf.changed or nginx_sites_available_default.changed
+    - name: Nginx default.conf sites-enabled present
+      file:
+        path: /etc/nginx/sites-enabled/default.conf
+        src: /etc/nginx/sites-available/default.conf
+        state: link
+      notify: Restart nginx
+
+    - name: Nginx localhost conf in place
+      template:
+        src: localhost.conf.j2
+        dest: /etc/nginx/sites-available/localhost.conf
+      notify: Restart nginx
+
+    - name: Nginx localhost enabled
+      file:
+        path: /etc/nginx/sites-enabled/localhost.conf
+        src: /etc/nginx/sites-available/localhost.conf
+        state: link
+      notify: Restart nginx
+
   tags:
     - nginx
 ...
