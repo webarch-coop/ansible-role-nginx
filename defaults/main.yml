@@ -1,8 +1,8 @@
 ---
 nginx_packages:
   - nginx-extras
-nginx_default_root: /var/www/html
-nginx_default_https_redirect: https://$host$request_uri
+# nginx_default_root: /var/www/html
+# nginx_default_https_redirect: https://$host$request_uri
 # OpenSSL DH Paramaters
 nginx_dhparam_size: "4096"
 nginx_dhparam_path: /etc/nginx/ssl_dhparam.pem

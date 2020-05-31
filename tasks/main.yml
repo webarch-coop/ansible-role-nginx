@@ -21,7 +21,6 @@
       template:
         src: nginx.conf.j2
         dest: /etc/nginx/nginx.conf
-      register: nginx_conf
       notify: Restart nginx
 
     - name: Nginx default sites-enabled absent
@@ -34,7 +33,6 @@
       template:
         src: default.conf.j2
         dest: /etc/nginx/sites-available/default.conf
-      register: nginx_sites_available_default
       notify: Restart nginx
 
     - name: Nginx default.conf sites-enabled present
