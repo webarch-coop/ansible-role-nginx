@@ -17,6 +17,11 @@
         size: "{{ nginx_dhparam_size | default('4096') }}"
       notify: Restart nginx
 
+    - name: Set a variable to incidate that IPv6 is enabled
+      set_fact:
+        nginx_ipv6: true
+      when: ansible_default_ipv6 | length > 0
+
     - name: Nginx conf in place
       template:
         src: nginx.conf.j2
