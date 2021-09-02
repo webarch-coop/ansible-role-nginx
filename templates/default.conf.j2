@@ -21,9 +21,9 @@
 # Default server configuration
 #
 server {
-	listen 80 default_server;
+	listen 80;
 {% if nginx_ipv6 is defined and nginx_ipv6 %}
-	listen [::]:80 default_server;
+	listen [::]:80;
 {% endif %}
 	# SSL configuration
 	#
