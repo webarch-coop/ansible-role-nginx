@@ -29,6 +29,9 @@
       template:
         src: nginx.conf.j2
         dest: /etc/nginx/nginx.conf
+        owner: root
+        group: root
+        mode: 0644
       notify: Restart nginx
 
     - name: Nginx default sites-enabled absent
@@ -41,6 +44,9 @@
       template:
         src: default.conf.j2
         dest: /etc/nginx/sites-available/default.conf
+        owner: root
+        group: root
+        mode: 0644
       notify: Restart nginx
 
     - name: Nginx default.conf sites-enabled present
@@ -48,12 +54,19 @@
         path: /etc/nginx/sites-enabled/default.conf
         src: /etc/nginx/sites-available/default.conf
         state: link
+        follow: false
+        mode: 0777
+        owner: root
+        group: root
       notify: Restart nginx
 
     - name: Nginx localhost conf in place
       template:
         src: localhost.conf.j2
         dest: /etc/nginx/sites-available/localhost.conf
+        owner: root
+        group: root
+        mode: 0644
       notify: Restart nginx
 
     - name: Test Nginx configuration
@@ -64,6 +77,10 @@
         path: /etc/nginx/sites-enabled/localhost.conf
         src: /etc/nginx/sites-available/localhost.conf
         state: link
+        follow: false
+        mode: 0777
+        owner: root
+        group: root
       notify: Restart nginx
 
   tags:
