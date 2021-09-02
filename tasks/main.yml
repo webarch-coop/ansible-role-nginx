@@ -15,6 +15,9 @@
       openssl_dhparam:
         path: "{{ nginx_dhparam_path | default('/etc/nginx/ssl_dhparam.pem') }}"
         size: "{{ nginx_dhparam_size | default('4096') }}"
+        owner: root
+        group: root
+        mode: 0600
       notify: Restart nginx
 
     - name: Set a variable to incidate that IPv6 is enabled
@@ -52,6 +55,9 @@
         src: localhost.conf.j2
         dest: /etc/nginx/sites-available/localhost.conf
       notify: Restart nginx
+
+    - name: Test Nginx configuration
+      command: service nginx configtest
 
     - name: Nginx localhost enabled
       file:
