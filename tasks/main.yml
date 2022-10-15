@@ -49,6 +49,16 @@
         mode: 0644
       notify: Restart nginx
 
+    - name: Debug nginx_sites_disabled
+      ansible.builtin.debug:
+        var: nginx_sites_disabled
+        verbosity: 2
+
+    - name: Debug nginx_sites_enabled
+      ansible.builtin.debug:
+        var: nginx_sites_enabled
+        verbosity: 2
+
     - name: Check that no sites are set to be enabled and disabled at the same time
       ansible.builtin.assert:
         that:
