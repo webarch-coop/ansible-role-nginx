@@ -49,6 +49,11 @@
         mode: 0644
       notify: Restart nginx
 
+    - name: Check that no sites are set to be enabled and disabled at the same time
+      ansible.builtin.assert:
+        that:
+          - nginx_sites_disabled | intersect(nginx_sites_enabled) | length == 0
+
     - name: Nginx sites-disabled
       ansible.builtin.file:
         path: "{{ file }}"
