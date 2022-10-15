@@ -24,7 +24,7 @@ argument_specs:
       nginx_default_root:
         type: str
         required: true
-        description: The default document root 
+        description: The default document root
       nginx_dhparam_path:
         type: str
         required: true

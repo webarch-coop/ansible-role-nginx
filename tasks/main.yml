@@ -40,7 +40,7 @@
         mode: 0644
       notify: Restart nginx
 
-    - name: Nginx localhost.conf sites-available present 
+    - name: Nginx localhost.conf sites-available present
       ansible.builtin.template:
         src: localhost.conf.j2
         dest: /etc/nginx/sites-available/localhost.conf
