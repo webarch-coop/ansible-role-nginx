@@ -1,0 +1,56 @@
+---
+argument_specs:
+  main:
+    author: Chris Croome
+    description: Ansible role for installing Nginx on Debian.
+    short_description: The main entry point for the Nginx role.
+    options:
+      nginx:
+        type: bool
+        required: true
+        description: Run the tasks in this role
+      nginx_cipher_suites_tls1_1:
+        type: list
+        required: true
+        description: TLSv1 cipher suites
+      nginx_cipher_suites_tls1_2:
+        type: list
+        required: true
+        description: TLSv2 cipher suites
+      nginx_cipher_suites_tls1_3:
+        type: list
+        required: true
+        description: TLSv3 cipher suites
+      nginx_default_root:
+        type: str
+        required: true
+        description: The default document root 
+      nginx_dhparam_path:
+        type: str
+        required: true
+        description: The path for the dhparam file
+      nginx_dhparam_size:
+        type: int
+        required: true
+        description: The dhparam size
+      nginx_packages:
+        type: list
+        required: true
+        description: A list of `.deb` packages
+      nginx_sites_disabled:
+        type: list
+        required: false
+        description: Symlinks absent from /etc/nginx/sites-enabled
+      nginx_sites_enabled:
+        type: list
+        required: false
+        description: Symlinks present in /etc/nginx/sites-enabled
+      nginx_tls1_1:
+        type: bool
+        required: true
+        description: Enable TLSv1
+      nginx_tls1_3:
+        type: bool
+        required: true
+        description: Enable TLSv3
+...

@@ -3,16 +3,13 @@
   block:
 
     - name: Nginx package present
-      apt:
-        pkg: "{{ pkg }}"
+      ansible.builtin.apt:
+        pkg: "{{ nginx_packages }}"
         state: present
         update_cache: false
-      loop: "{{ nginx_packages }}"
-      loop_control:
-        loop_var: pkg
 
     - name: Generate DH Parameters
-      openssl_dhparam:
+      community.crypto.openssl_dhparam:
         path: "{{ nginx_dhparam_path | default('/etc/nginx/ssl_dhparam.pem') }}"
         size: "{{ nginx_dhparam_size | default('4096') }}"
         owner: root
@@ -21,12 +18,12 @@
       notify: Restart nginx
 
     - name: Set a variable to incidate that IPv6 is enabled
-      set_fact:
+      ansible.builtin.set_fact:
         nginx_ipv6: true
       when: ansible_default_ipv6 | length > 0
 
     - name: Nginx conf in place
-      template:
+      ansible.builtin.template:
         src: nginx.conf.j2
         dest: /etc/nginx/nginx.conf
         owner: root
@@ -34,14 +31,8 @@
         mode: 0644
       notify: Restart nginx
 
-    - name: Nginx default sites-enabled absent
-      file:
-        path: /etc/nginx/sites-enabled/default
-        state: absent
-      notify: Restart nginx
-
     - name: Nginx default.conf sites-available present
-      template:
+      ansible.builtin.template:
         src: default.conf.j2
         dest: /etc/nginx/sites-available/default.conf
         owner: root
@@ -49,19 +40,8 @@
         mode: 0644
       notify: Restart nginx
 
-    - name: Nginx default.conf sites-enabled present
-      file:
-        path: /etc/nginx/sites-enabled/default.conf
-        src: /etc/nginx/sites-available/default.conf
-        state: link
-        follow: false
-        mode: 0777
-        owner: root
-        group: root
-      notify: Restart nginx
-
-    - name: Nginx localhost conf in place
-      template:
+    - name: Nginx localhost.conf sites-available present 
+      ansible.builtin.template:
         src: localhost.conf.j2
         dest: /etc/nginx/sites-available/localhost.conf
         owner: root
@@ -69,20 +49,41 @@
         mode: 0644
       notify: Restart nginx
 
-    - name: Test Nginx configuration
-      command: service nginx configtest
+    - name: Nginx sites-disabled
+      ansible.builtin.file:
+        path: "{{ file }}"
+        state: absent
+      loop: "{{ nginx_sites_disabled }}"
+      loop_control:
+        loop_var: file
+      when:
+        - nginx_sites_disabled is defined
+        - nginx_sites_disabled | length > 0
+      notify: Restart nginx
 
-    - name: Nginx localhost enabled
-      file:
-        path: /etc/nginx/sites-enabled/localhost.conf
-        src: /etc/nginx/sites-available/localhost.conf
+    - name: Nginx sites-enabled
+      ansible.builtin.file:
+        path: "/etc/nginx/sites-enabled/{{ file }}"
+        src: "/etc/nginx/sites-available/{{ file }}"
         state: link
         follow: false
         mode: 0777
         owner: root
         group: root
+      loop: "{{ nginx_sites_enabled }}"
+      loop_control:
+        loop_var: file
+      when:
+        - nginx_sites_enabled is defined
+        - nginx_sites_enabled | length > 0
       notify: Restart nginx
 
+    - name: Test Nginx configuration
+      ansible.builtin.command: service nginx configtest
+      changed_when: false
+      check_mode: false
+
+  when: (nginx is defined) and (nginx | bool)
   tags:
     - nginx
 ...

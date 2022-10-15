@@ -1,6 +1,6 @@
 ---
 - name: Nginx restarted
-  service:
+  ansible.builtin.service:
     name: nginx
     state: restarted
   listen: Restart nginx
