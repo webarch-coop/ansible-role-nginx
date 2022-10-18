@@ -67,8 +67,8 @@
           ansible.builtin.debug:
             var: nginx_sites_enabled
 
-         - name: Fail due to one or more sites being set to be enabled and disabled at the same time
-           ansible.builtin.fail:
+        - name: Fail due to one or more sites being set to be enabled and disabled at the same time
+          ansible.builtin.fail:
 
     - name: Nginx sites-disabled
       ansible.builtin.file:
