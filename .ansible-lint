@@ -1,9 +1,8 @@
 ---
-# https://docs.ansible.com/ansible-lint/rules/default_rules.html
+# https://ansible-lint.readthedocs.io/rules/
 skip_list:
-  # Lines should be no longer than 160 chars
-  - "204"
-  # service used in place of service module
-  - "303"
+  - key-order[task]
+  - command-instead-of-module
+  - schema[meta]
 # vim: syntax=yaml
 ...
