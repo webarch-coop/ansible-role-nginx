@@ -85,11 +85,11 @@
 
         - name: Nginx sites-disabled
           ansible.builtin.file:
-            path: "{{ file }}"
+            path: "/etc/nginx/sites-enabled/{{ nginx_symlink }}"
             state: absent
           loop: "{{ nginx_sites_disabled }}"
           loop_control:
-            loop_var: file
+            loop_var: nginx_symlink
           when:
             - nginx_sites_disabled is defined
             - nginx_sites_disabled | length > 0
@@ -97,8 +97,8 @@
 
         - name: Nginx sites-enabled
           ansible.builtin.file:
-            path: "/etc/nginx/sites-enabled/{{ file }}"
-            src: "/etc/nginx/sites-available/{{ file }}"
+            path: "/etc/nginx/sites-enabled/{{ nginx_symlink }}"
+            src: "/etc/nginx/sites-available/{{ nginx_symlink }}"
             state: link
             follow: false
             mode: 0777
@@ -106,7 +106,7 @@
             group: root
           loop: "{{ nginx_sites_enabled }}"
           loop_control:
-            loop_var: file
+            loop_var: nginx_symlink
           when:
             - nginx_sites_enabled is defined
             - nginx_sites_enabled | length > 0
