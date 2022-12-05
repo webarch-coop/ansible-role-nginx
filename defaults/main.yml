@@ -15,7 +15,8 @@ nginx_packages:
 nginx_tls1_1: false
 # Enable TLSv1.3
 nginx_tls1_3: true
-nginx_sites_disabled: []
+nginx_sites_disabled:
+  - default
 nginx_sites_enabled:
   - default.conf
   - localhost.conf

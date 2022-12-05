@@ -4,6 +4,15 @@
 
 An Ansible role for installing [Nginx](https://nginx.org/en/) on Debian servers.
 
+## Usage
+
+To only install packages you can run this role using the `nginx_install` tag.
+
+Once Nginx is installed you can use the `nginx_conf` tag with `--check`.
+
+
+## Defaults
+
 The [default variables](defaults/main.yml):
 
 | Variable name                | Default value                                                                                                                                                                                                                      | Comment                                          |
