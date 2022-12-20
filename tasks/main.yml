@@ -20,6 +20,13 @@
     - name: Configure Nginx when /etc/nginx exists
       block:
 
+        - name: Include cert checks
+          ansible.builtin.include_tasks: cert.yml
+          when:
+            - ( nginx_default_ssl_certificate is defined ) and ( nginx_default_ssl_certificate | length > 0 ) 
+            - ( nginx_default_ssl_certificate_key is defined ) and ( nginx_default_ssl_certificate_key | length > 0 ) 
+            - ( nginx_default_ssl_trusted_certificate is defined ) and ( nginx_default_ssl_trusted_certificate | length > 0 ) 
+
         - name: Generate DH Parameters
           community.crypto.openssl_dhparam:
             path: "{{ nginx_dhparam_path | default('/etc/nginx/ssl_dhparam.pem') }}"

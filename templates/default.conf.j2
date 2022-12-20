@@ -20,9 +20,9 @@
 # Default server configuration
 #
 server {
-	listen 80;
+	listen 80{% if nginx_default_server | bool %} default_server{% endif %};
 {% if nginx_ipv6 is defined and nginx_ipv6 %}
-	listen [::]:80;
+	listen [::]:80{% if nginx_default_server | bool %} default_server{% endif %};
 {% endif %}
 	# SSL configuration
 	#
@@ -43,9 +43,9 @@ server {
 	root {{ nginx_default_root }};
 
 	# Add index.php to the list if you are using PHP
-	index index.html index.htm index.nginx-debian.html;
+	index {% if nginx_default_server_index is defined %}{% for nginx_index in nginx_default_server_index %}{{ nginx_index }}{% if not loop.last %} {% endif %}{% endfor %}{% else %}index.html index.htm index.nginx-debian.html{% endif %};
 
-	server_name _;
+	server_name "{% if nginx_default_server_name is defined %}{{ nginx_default_server_name }}{% else %}_{% endif %}";
 
 	location /.well-known/acme-challenge/ {
 		allow all;
@@ -81,6 +81,37 @@ server {
 	#	deny all;
 	#}
 }
+
+{% if nginx_default_tls is defined and nginx_default_tls | bool %}
+# Default TLS server configuration
+#
+server {
+        # https://ssl-config.mozilla.org/
+        listen 443 ssl http2{% if nginx_default_server | bool %} default_server{% endif %};
+        listen [::]:443 ssl http2{% if nginx_default_server | bool %} default_server{% endif %};
+        ssl_certificate {{ nginx_default_ssl_certificate }};
+        ssl_certificate_key {{ nginx_default_ssl_certificate_key }};
+        ssl_trusted_certificate {{ nginx_default_ssl_trusted_certificate }};
+        ssl_ciphers {% if "TLSv1.3" in nginx_ssl_protocols %}{{ nginx_cipher_suites_tls1_3 }}{% endif %}{% if "TLSv1.2" in nginx_ssl_protocols and "TLSv1.3" in nginx_ssl_protocols %}:{% endif %}{% if "TLSv1.2" in nginx_ssl_protocols %}{{ nginx_cipher_suites_tls1_2 }}{% endif %};
+        ssl_session_timeout 1d;
+        ssl_session_cache shared:MozSSL:10m;  # about 40000 sessions
+        ssl_session_tickets off;
+        ssl_protocols {% for nginx_ssl_protocol in nginx_ssl_protocols %}{{ nginx_ssl_protocol }}{% if not loop.last %} {% endif %}{% endfor %};
+        ssl_prefer_server_ciphers off;
+        add_header Strict-Transport-Security "max-age=63072000" always;
+        ssl_stapling on;
+        ssl_stapling_verify on;
+
+        server_name "{% if nginx_default_server_name is defined %}{{ nginx_default_server_name }}{% else %}_{% endif %}";
+        root {{ nginx_default_root }};
+        index {% if nginx_default_server_index is defined %}{% for nginx_index in nginx_default_server_index %}{{ nginx_index }}{% if not loop.last %} {% endif %}{% endfor %}{% else %}index.html index.htm index.nginx-debian.html{% endif %};
+{% if nginx_default_redirect is defined %}
+        location / {
+                return 301 {{ nginx_default_redirect }};
+	}
+{% endif %}
+}
+{% endif %}
 
 
 # Virtual Host configuration for example.com

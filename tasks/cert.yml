@@ -1,0 +1,51 @@
+---
+- name: Check TLS certificates
+  block:
+
+    - name: Check the cert
+      ansible.builtin.stat:
+        path: "{{ nginx_default_ssl_certificate }}"
+      register: nginx_cert
+
+    - name: Check the key
+      ansible.builtin.stat:
+        path: "{{ nginx_default_ssl_certificate_key }}"
+      register: nginx_key
+
+    - name: Check the CA
+      ansible.builtin.stat:
+        path: "{{ nginx_default_ssl_trusted_certificate }}"
+      register: nginx_ca
+
+    - name: Check the cert info
+      block:
+
+        - name: Read TLS cert information
+          community.crypto.x509_certificate_info:
+            path: "{{ nginx_default_ssl_certificate }}"
+            valid_at:
+              tomorrow: "+1d"
+              next_week: "+1w"
+              next_month: "+1m"
+          register: nginx_cert_info
+
+        - name: Debug cert info
+          ansible.builtin.debug:
+            var: synapse_cert_info
+            verbosity: 3
+
+        - name: Set a fact to enable TLS for the default server
+          ansible.builtin.set_fact:
+            nginx_default_tls: true
+          when:
+            - nginx_cert_info.subject.commonName == nginx_default_server_name
+            - nginx_cert_info.valid_at.next_week | bool
+
+      when:
+        - nginx_cert.stat.exists | bool
+        - nginx_key.stat.exists | bool
+        - nginx_ca.stat.exists | bool
+
+  tags:
+    - nginx
+...
