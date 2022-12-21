@@ -57,7 +57,7 @@
         - name: Set a fact for the sites-available
           ansible.builtin.set_fact:
             nginx_existing_sites_available: "{{ nginx_ls_sites_available.stdout | community.general.jc('ls') }}"
-            nginx_existing_sites_available_filenames: "{{ nginx_ls_sites_available.stdout | community.general.jc('ls') | community.general.json_query('[].filename') }}"
+            nginx_existing_sites_available_filenames: "{{ nginx_ls_sites_available.stdout | community.general.jc('ls') | community.general.json_query('[].filename') | sort }}"
 
         - name: Debug nginx_existing_sites_available
           ansible.builtin.debug:
@@ -83,7 +83,7 @@
         - name: Set a fact for the list of sites-enabled
           ansible.builtin.set_fact:
             nginx_existing_sites_enabled: "{{ nginx_ls_sites_enabled.stdout | community.general.jc('ls') }}"
-            nginx_existing_sites_enabled_filenames: "{{ nginx_ls_sites_enabled.stdout | community.general.jc('ls') | community.general.json_query('[].filename') }}"
+            nginx_existing_sites_enabled_filenames: "{{ nginx_ls_sites_enabled.stdout | community.general.jc('ls') | community.general.json_query('[].filename') | sort }}"
 
         - name: Debug nginx_existing_sites_enabled
           ansible.builtin.debug:
