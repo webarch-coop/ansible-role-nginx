@@ -10,7 +10,7 @@ To only install packages you can run this role using the `nginx_install` tag.
 
 Once Nginx is installed you can use the `nginx_conf` tag with `--check`.
 
-## Defaults
+## Role variables
 
 The [default variables](defaults/main.yml):
 
@@ -32,42 +32,42 @@ A list of TLSv1.2 cipher suites, this defaults to the [Mozilla modern compatibil
 
 ### nginx_default_https_redirect
 
-A URL to redirect HTTP requests to, `nginx_default_https_redirect` defaults to `https://$host$request_uri`.
+A URL to redirect port 80 HTTP requests to in the `default.conf` configuration file, `nginx_default_https_redirect` defaults to `https://$host$request_uri`.
 
 ### nginx_default_redirect
 
-An optional URL to redirect port 443 requests to the `nginx_default_server_name` to. This variable is not set by default.
+An optional URL to redirect port 443 HTTPS requests to in the `default.conf` configuration file, `nginx_default_server_name` to. This variable is not set by default.
 
 ### nginx_default_root
 
-The default `root` for HTML files, this defaults to `/var/www/html`.
+The default `root` for HTML files in the `default.conf` configuration file, this defaults to `/var/www/html`.
 
 ### nginx_default_server
 
-If `nginx_default_server` is `true` then the `default.conf` server configuration will include `default_server` in the `listen` directive, it defaults to `true`.
+If `nginx_default_server` is `true` then the `default.conf` server configuration file will include `default_server` in the `listen` directive, it defaults to `true`.
 
 ### nginx_default_server_index
 
-A list of file names to be used for the `index` directive, it defaults to:
+A list of file names to be used for the `index` directive, in the `default.conf` configuration file, it defaults to:
 
 * `index.html`
 * `index.nginx-debian.html`
 
 ### nginx_default_server_name
 
-The `server_name` to use in the `default.conf` server configuration, it defaults to `{{ inventory_hostname }}`.
+The `server_name` to use in the `default.conf` server configuration file, it defaults to `{{ inventory_hostname }}`.
 
 ### nginx_default_ssl_certificate
 
-An optional path to a TLS certificate for the `default.conf` server configuration, set it to an empty string to disable TLS in `default.conf`.
+An optional path to a TLS certificate for the `default.conf` server configuration file, set it to an empty string to disable TLS in `default.conf`.
 
 ### nginx_default_ssl_certificate_key
 
-An optional path to a TLS key for the `default.conf` server configuration, set it to an empty string to disable TLS in `default.conf`.
+An optional path to a TLS key for the `default.conf` server configuration file, set it to an empty string to disable TLS in `default.conf`.
 
 ### nginx_default_ssl_trusted_certificate
 
-An optional path to a CA certificate for the `default.conf` server configuration, set it to an empty string to disable TLS in `default.conf`.
+An optional path to a CA certificate for the `default.conf` server configuration file, set it to an empty string to disable TLS in `default.conf`.
 
 ### nginx_dhparam_path
 
@@ -96,11 +96,25 @@ A list of files that are present in `/etc/nginx/sites-available` that should be 
 * `default.conf`
 * `localhost.conf`
 
-## nginx_ssl_protocols
+### nginx_ssl_protocols
 
 A list of TLS protocols for [ssl_protocols](https://nginx.org/en/docs/http/ngx_http_ssl_module.html#ssl_protocols), this defaults to:
 
 * `TLSv1.2`
 * `TLSv1.3`
 
-This role no loger supports `TLSv1.1` or `TLSv1.0`.
+This role no longer supports `TLSv1.1` or `TLSv1.0`.
+
+## Dependencies
+
+This role requires Ansible `2.13` or newer plus [JC](https://pypi.org/project/jc/) and [JMESPath](https://pypi.org/project/jmespath/) to be installed using `pip3` on the Ansible controller.
+
+## Repository
+
+The primary URL of this repo is [`https://git.coop/webarch/nginx`](https://git.coop/webarch/nginx) however it is also [mirrored to GitHub](https://github.com/webarch-coop/ansible-role-nginx) and [available via Ansible Galaxy](https://galaxy.ansible.com/chriscroome/nginx).
+    
+If you use this role please use a tagged release, see [the release notes](https://git.coop/webarch/nginx/-/releases).
+
+## License
+
+This role is released under [the same terms as Ansible itself](https://github.com/ansible/ansible/blob/devel/COPYING), the [GNU GPLv3](LICENSE).
