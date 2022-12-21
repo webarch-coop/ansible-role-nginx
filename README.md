@@ -16,7 +16,7 @@ Once Nginx is installed you can use the `nginx_conf` tag with `--check`.
 
 ## Role variables
 
-The [default variables](defaults/main.yml):
+See the [defaults/main.yml](defaults/main.yml) file for the default variables and [meta/argument_spacs.yml](meta/argument_specs.yml) for the variable specification.
 
 ### nginx
 
