@@ -4,6 +4,10 @@
 
 An Ansible role for installing [Nginx](https://nginx.org/en/) on Debian servers.
 
+By default this role installs `nginx-extras`, templates [nginx.conf](templates/nginx.conf.j2) which enables TLSv1.2 and TLSv1.3, generates a Diffie-Hellman parameters file, removes the `/etc/nginx/sites-enabled/default` symlink and creates and symlinks a [default.conf](templates/default.conf.j2) and a [localhost.conf](templates/localhost.conf.j2).
+
+The setting the sites that are enabled can be done using the `nginx_sites_enabled` and `nginx_sites_disabled` lists, after sites are enabled `service nginx configtest` is run and if the configtest test fails the site is disabled and this role stops.
+
 ## Usage
 
 To only install packages you can run this role using the `nginx_install` tag.
@@ -71,7 +75,7 @@ An optional path to a CA certificate for the `default.conf` server configuration
 
 ### nginx_dhparam_path
 
-The path to the Diffie-Hellman parameters TLS key, this defaults to `/etc/nginx/ssl_dhparam.pem`.
+The path to the Diffie-Hellman parameters file, this defaults to `/etc/nginx/ssl_dhparam.pem`.
 
 ### nginx_dhparam_size
 
