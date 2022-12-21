@@ -1,5 +1,5 @@
 ---
-- name: Install nginx-extras and do some basic configuration
+- name: Install and configure Nginx
   block:
 
     - name: Nginx package present
@@ -7,39 +7,28 @@
         pkg: "{{ nginx_packages }}"
         state: present
         update_cache: false
+      when:
+        - nginx_packages is defined
+        - nginx_packages != []
       tags:
         - nginx_install
 
-    - name: Stat /etc/nginx
-      ansible.builtin.stat:
-        path: /etc/nginx
-      register: nginx_etc
+    - name: Include checks
+      ansible.builtin.include_tasks: checks.yml
       tags:
         - ngnix_config
 
     - name: Configure Nginx when /etc/nginx exists
       block:
 
-        - name: Include cert checks
-          ansible.builtin.include_tasks: cert.yml
-          when:
-            - ( nginx_default_ssl_certificate is defined ) and ( nginx_default_ssl_certificate | length > 0 )
-            - ( nginx_default_ssl_certificate_key is defined ) and ( nginx_default_ssl_certificate_key | length > 0 )
-            - ( nginx_default_ssl_trusted_certificate is defined ) and ( nginx_default_ssl_trusted_certificate | length > 0 )
-
         - name: Generate DH Parameters
           community.crypto.openssl_dhparam:
-            path: "{{ nginx_dhparam_path | default('/etc/nginx/ssl_dhparam.pem') }}"
-            size: "{{ nginx_dhparam_size | default('4096') }}"
+            path: "{{ nginx_dhparam_path }}"
+            size: "{{ nginx_dhparam_size }}"
             owner: root
             group: root
             mode: 0600
           notify: Restart nginx
-
-        - name: Set a variable to incidate that IPv6 is enabled
-          ansible.builtin.set_fact:
-            nginx_ipv6: true
-          when: ansible_default_ipv6 | length > 0
 
         - name: Nginx conf in place
           ansible.builtin.template:
@@ -68,68 +57,33 @@
             mode: 0644
           notify: Restart nginx
 
-        - name: Check sites-enabled and sites-disabled
-          block:
-
-            - name: Check that no sites are set to be enabled and disabled at the same time
-              ansible.builtin.assert:
-                that:
-                  - nginx_sites_disabled | intersect(nginx_sites_enabled) | length == 0
-                quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-
-          rescue:
-
-            - name: Debug nginx_sites_disabled
-              ansible.builtin.debug:
-                var: nginx_sites_disabled
-
-            - name: Debug nginx_sites_enabled
-              ansible.builtin.debug:
-                var: nginx_sites_enabled
-
-            - name: Fail due to one or more sites being set to be enabled and disabled at the same time
-              ansible.builtin.fail:
-
-        - name: Nginx sites-disabled
-          ansible.builtin.file:
-            path: "/etc/nginx/sites-enabled/{{ nginx_symlink }}"
-            state: absent
+        - name: Include include site disabled tasks
+          ansible.builtin.include_tasks: site_disabled.yml
           loop: "{{ nginx_sites_disabled }}"
           loop_control:
-            loop_var: nginx_symlink
+            loop_var: nginx_site
           when:
             - nginx_sites_disabled is defined
-            - nginx_sites_disabled | length > 0
-          notify: Restart nginx
+            - nginx_sites_disabled != []
+            - nginx_site in nginx_existing_sites_enabled_filenames
 
-        - name: Nginx sites-enabled
-          ansible.builtin.file:
-            path: "/etc/nginx/sites-enabled/{{ nginx_symlink }}"
-            src: "/etc/nginx/sites-available/{{ nginx_symlink }}"
-            state: link
-            follow: false
-            mode: 0777
-            owner: root
-            group: root
+        - name: Include site enabled tasks
+          ansible.builtin.include_tasks: site_enabled.yml
           loop: "{{ nginx_sites_enabled }}"
           loop_control:
-            loop_var: nginx_symlink
+            loop_var: nginx_site
           when:
             - nginx_sites_enabled is defined
-            - nginx_sites_enabled | length > 0
-          notify: Restart nginx
-
-        - name: Test Nginx configuration
-          ansible.builtin.command: service nginx configtest
-          changed_when: false
-          check_mode: false
-          notify: Restart nginx
+            - nginx_sites_enabled != []
+            - nginx_site not in nginx_existing_sites_enabled_filenames
 
       when: nginx_etc.stat.exists | bool
       tags:
         - ngnix_config
 
-  when: (nginx is defined) and (nginx | bool)
+  when:
+    - nginx is defined
+    - nginx | bool
   tags:
     - nginx
 ...

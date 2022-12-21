@@ -1,0 +1,19 @@
+---
+- name: Disable site
+  block:
+
+    - name: Fail if a site that doesn't exist is to be disabled
+      ansible.builtin.fail:
+        msg: "There is not point in trying to remove a symlink that points to /etc/nginx/sites-available/{{ nginx_site }} when the file doesn't exist."
+      when: nginx_site not in nginx_ls_sites_available
+
+    - name: Nginx site disabled
+      ansible.builtin.file:
+        path: "/etc/nginx/sites-enabled/{{ nginx_site }}"
+        state: absent
+      notify: Restart nginx
+
+  tags:
+    - nginx
+    - ngnix_config
+...

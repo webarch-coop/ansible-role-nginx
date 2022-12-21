@@ -1,0 +1,43 @@
+---
+- name: Enable site
+  block:
+
+    - name: Fail if a site that doesn't exist is to be enabled
+      ansible.builtin.fail:
+        msg: "There is not point in trying to create a symlink to point to /etc/nginx/sites-available/{{ nginx_site }} when the file doesn't exist."
+      when: nginx_site not in nginx_existing_sites_available
+
+    - name: Nginx site enabled
+      ansible.builtin.file:
+        path: "/etc/nginx/sites-enabled/{{ nginx_site }}"
+        src: "/etc/nginx/sites-available/{{ nginx_site }}"
+        state: link
+        follow: false
+        mode: 0777
+        owner: root
+        group: root
+      notify: Restart nginx
+
+    - name: Test the enabled site
+      block:
+
+        - name: Nginx configtest
+          ansible.builtin.command: service nginx configtest
+          changed_when: false
+          check_mode: false
+
+      rescue:
+
+        - name: Nginx site disabled as it causes a configtest failure
+          ansible.builtin.file:
+            path: "/etc/nginx/sites-enabled/{{ nginx_site }}"
+            state: absent
+
+        - name: Fail as the Nginx config test fails when the site is enabled
+          ansible.builtin.fail:
+            msg: "The /etc/nginx/sites-available/{{ nginx_site }} file has not been enabled because when it was the `service nginx configtest` failed."
+
+  tags:
+    - nginx
+    - ngnix_config
+...
