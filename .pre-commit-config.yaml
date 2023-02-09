@@ -8,25 +8,11 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Nginx Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-galaxy_info:
-  role_name: nginx
-  author: Chris Croome
-  namespace: chriscroome
-  description: Ansible role for installing Nginx extras package on Debian servers
-  company: Webarchitects Co-operative
-  license: GNU General Public License v3.0 (GPLv3)
-  min_ansible_version: "2.13"
-  platforms:
-    - name: debian
-      versions:
-        - bookworm
-        - bullseye
-        - buster
-        - stretch
-  galaxy_tags:
-    - debian
-    - nginx
-dependencies: []
-# List your role dependencies here, one per line. Be sure to remove the '[]' above,
-# if you add dependencies to this list.
+# https://yamllint.readthedocs.io/en/stable/integration.html
+# https://github.com/adrienverge/yamllint/tags
+repos:
+  - repo: https://github.com/adrienverge/yamllint.git
+    rev: v1.29.0
+    hooks:
+      - id: yamllint
 ...

@@ -116,7 +116,7 @@ This role requires Ansible `2.13` or newer plus [JC](https://pypi.org/project/jc
 ## Repository
 
 The primary URL of this repo is [`https://git.coop/webarch/nginx`](https://git.coop/webarch/nginx) however it is also [mirrored to GitHub](https://github.com/webarch-coop/ansible-role-nginx) and [available via Ansible Galaxy](https://galaxy.ansible.com/chriscroome/nginx).
-    
+
 If you use this role please use a tagged release, see [the release notes](https://git.coop/webarch/nginx/-/releases).
 
 ## License
