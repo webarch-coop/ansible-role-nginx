@@ -66,6 +66,9 @@
             mode: 0644
           notify: Restart nginx
 
+        - name: Include site checks
+          ansible.builtin.include_tasks: site_checks.yml
+
         - name: Include include site disabled tasks
           ansible.builtin.include_tasks: site_disabled.yml
           loop: "{{ nginx_sites_disabled }}"

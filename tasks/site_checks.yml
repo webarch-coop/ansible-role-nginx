@@ -1,0 +1,168 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects Nginx Ansible role.
+#
+# The Webarchitects Nginx Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Nginx Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Nginx Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+- name: Nginx site checks
+  block:
+
+    - name: Check sites-enabled and sites-disabled
+      block:
+
+        - name: Check that no sites are set to be enabled and disabled at the same time
+          ansible.builtin.assert:
+            that:
+              - nginx_sites_disabled | intersect(nginx_sites_enabled) | length == 0
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+
+      rescue:
+
+        - name: Debug nginx_sites_disabled
+          ansible.builtin.debug:
+            var: nginx_sites_disabled
+
+        - name: Debug nginx_sites_enabled
+          ansible.builtin.debug:
+            var: nginx_sites_enabled
+
+        - name: Fail due to one or more sites being set to be enabled and disabled at the same time
+          ansible.builtin.fail:
+
+      when:
+        - nginx_sites_disabled is defined
+        - nginx_sites_enabled is defined
+
+    - name: Check the sites-available
+      ansible.builtin.command: ls -l /etc/nginx/sites-available/
+      check_mode: false
+      changed_when: false
+      register: nginx_ls_sites_available
+
+    - name: Debug sites-available
+      ansible.builtin.debug:
+        var: nginx_ls_sites_available.stdout
+        verbosity: 3
+
+    - name: Set a fact for the sites-available
+      ansible.builtin.set_fact:
+        nginx_existing_sites_available: "{{ nginx_ls_sites_available.stdout | community.general.jc('ls') }}"
+        nginx_existing_sites_available_filenames: "{{ nginx_ls_sites_available.stdout | community.general.jc('ls') | community.general.json_query('[].filename') | sort }}"
+
+    - name: Debug nginx_existing_sites_available
+      ansible.builtin.debug:
+        var: nginx_existing_sites_available
+        verbosity: 2
+
+    - name: Debug nginx_existing_sites_available_filenames
+      ansible.builtin.debug:
+        var: nginx_existing_sites_available_filenames
+        verbosity: 2
+
+    - name: Check the sites-enabled
+      ansible.builtin.command: ls -l /etc/nginx/sites-enabled/
+      check_mode: false
+      changed_when: false
+      register: nginx_ls_sites_enabled
+
+    - name: Debug sites-enabled
+      ansible.builtin.debug:
+        var: nginx_ls_sites_enabled.stdout
+        verbosity: 3
+
+    - name: Set a fact for the list of sites-enabled
+      ansible.builtin.set_fact:
+        nginx_existing_sites_enabled: "{{ nginx_ls_sites_enabled.stdout | community.general.jc('ls') }}"
+        nginx_existing_sites_enabled_filenames: "{{ nginx_ls_sites_enabled.stdout | community.general.jc('ls') | community.general.json_query('[].filename') | sort }}"
+
+    - name: Debug nginx_existing_sites_enabled
+      ansible.builtin.debug:
+        var: nginx_existing_sites_enabled
+        verbosity: 2
+
+    - name: Debug nginx_existing_sites_enabled_filenames
+      ansible.builtin.debug:
+        var: nginx_existing_sites_enabled_filenames
+        verbosity: 2
+
+    - name: Check that all sites that are to be enabled exist
+      ansible.builtin.assert:
+        that:
+          - nginx_site in nginx_existing_sites_available_filenames
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+      loop: "{{ nginx_sites_enabled }}"
+      loop_control:
+        loop_var: nginx_site
+
+    - name: Check that all sites that are to be disabled exist
+      ansible.builtin.assert:
+        that:
+          - nginx_site in nginx_existing_sites_available_filenames
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+      loop: "{{ nginx_sites_disabled }}"
+      loop_control:
+        loop_var: nginx_site
+
+    - name: Check TLS certificates
+      block:
+
+        - name: Check the cert
+          ansible.builtin.stat:
+            path: "{{ nginx_default_ssl_certificate }}"
+          register: nginx_cert
+
+        - name: Check the key
+          ansible.builtin.stat:
+            path: "{{ nginx_default_ssl_certificate_key }}"
+          register: nginx_key
+
+        - name: Check the CA
+          ansible.builtin.stat:
+            path: "{{ nginx_default_ssl_trusted_certificate }}"
+          register: nginx_ca
+
+        - name: Check the cert info
+          block:
+
+            - name: Read TLS cert information
+              community.crypto.x509_certificate_info:
+                path: "{{ nginx_default_ssl_certificate }}"
+                valid_at:
+                  tomorrow: "+1d"
+                  next_week: "+1w"
+                  next_month: "+1m"
+              register: nginx_cert_info
+
+            - name: Debug cert info
+              ansible.builtin.debug:
+                var: synapse_cert_info
+                verbosity: 3
+
+            - name: Set a fact to enable TLS for the default server
+              ansible.builtin.set_fact:
+                nginx_default_tls: true
+              when:
+                - nginx_cert_info.subject.commonName == nginx_default_server_name
+                - nginx_cert_info.valid_at.next_week | bool
+
+          when:
+            - nginx_cert.stat.exists | bool
+            - nginx_key.stat.exists | bool
+            - nginx_ca.stat.exists | bool
+
+      when:
+        - nginx_default_ssl_certificate is defined
+        - nginx_default_ssl_certificate | length > 0
+        - nginx_default_ssl_certificate_key is defined
+        - nginx_default_ssl_certificate_key | length > 0
+        - nginx_default_ssl_trusted_certificate is defined
+        - nginx_default_ssl_trusted_certificate | length > 0
+
+  tags:
+    - nginx
+    - ngnix_config
+...
