@@ -11,15 +11,15 @@
 - name: Enable site
   block:
 
-    - name: Debug nginx_existing_sites_available
+    - name: Debug nginx_existing_sites_available_filenames
       ansible.builtin.debug:
-        var: nginx_existing_sites_available
+        var: nginx_existing_sites_available_filenames
         verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
 
     - name: Fail if a site that doesn't exist is to be enabled
       ansible.builtin.fail:
         msg: "There is not point in trying to create a symlink to point to /etc/nginx/sites-available/{{ nginx_site }} when the file doesn't exist."
-      when: nginx_site not in nginx_existing_sites_available
+      when: nginx_site not in nginx_existing_sites_available_filenames
 
     - name: Nginx site enabled
       ansible.builtin.file:
@@ -31,7 +31,7 @@
         owner: root
         group: root
       notify: Restart nginx
-      when: nginx_site in nginx_existing_sites_available
+      when: nginx_site in nginx_existing_sites_available_filenames
 
     - name: Test the enabled site
       block:
