@@ -11,6 +11,11 @@
 - name: Disable site
   block:
 
+    - name: Debug nginx_ls_sites_available
+      ansible.builtin.debug:
+        var: nginx_ls_sites_available
+        verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+
     - name: Fail if a site that doesn't exist is to be disabled
       ansible.builtin.fail:
         msg: "There is not point in trying to remove a symlink that points to /etc/nginx/sites-available/{{ nginx_site }} when the file doesn't exist."
@@ -21,6 +26,7 @@
         path: "/etc/nginx/sites-enabled/{{ nginx_site }}"
         state: absent
       notify: Restart nginx
+      when: nginx_site in nginx_ls_sites_available
 
   tags:
     - nginx
