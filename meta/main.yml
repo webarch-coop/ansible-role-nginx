@@ -17,12 +17,11 @@ galaxy_info:
   license: GNU General Public License v3.0 (GPLv3)
   min_ansible_version: "2.13"
   platforms:
-    - name: debian
+    - name: Debian
       versions:
         - bookworm
         - bullseye
         - buster
-        - stretch
   galaxy_tags:
     - debian
     - nginx

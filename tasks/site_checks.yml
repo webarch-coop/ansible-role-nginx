@@ -52,6 +52,7 @@
       ansible.builtin.set_fact:
         nginx_existing_sites_available: "{{ nginx_ls_sites_available.stdout | string | community.general.jc('ls') }}"
         nginx_existing_sites_available_filenames: "{{ nginx_ls_sites_available.stdout | string | community.general.jc('ls') | community.general.json_query('[].filename') | sort }}"
+      when: nginx_ls_sites_available.stdout != "total 0"
 
     - name: Debug nginx_existing_sites_available
       ansible.builtin.debug:
@@ -78,6 +79,7 @@
       ansible.builtin.set_fact:
         nginx_existing_sites_enabled: "{{ nginx_ls_sites_enabled.stdout | string | community.general.jc('ls') }}"
         nginx_existing_sites_enabled_filenames: "{{ nginx_ls_sites_enabled.stdout | string | community.general.jc('ls') | community.general.json_query('[].filename') | sort }}"
+      when: nginx_ls_sites_enabled.stdout != "total 0"
 
     - name: Debug nginx_existing_sites_enabled
       ansible.builtin.debug:
@@ -97,6 +99,7 @@
       loop: "{{ nginx_sites_enabled }}"
       loop_control:
         loop_var: nginx_site
+      when: nginx_existing_sites_available_filenames != []
 
     - name: Check that all sites that are to be disabled exist
       ansible.builtin.assert:
@@ -106,6 +109,7 @@
       loop: "{{ nginx_sites_disabled }}"
       loop_control:
         loop_var: nginx_site
+      when: nginx_existing_sites_available_filenames != []
 
   tags:
     - nginx

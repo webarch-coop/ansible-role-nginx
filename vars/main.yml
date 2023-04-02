@@ -1,0 +1,5 @@
+---
+nginx_existing_sites_available: []
+nginx_existing_sites_available_filenames: []
+nginx_existing_sites_enabled: []
+nginx_existing_sites_enabled_filenames: []
