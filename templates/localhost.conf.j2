@@ -1,6 +1,6 @@
 # {{ ansible_managed }}
 server {
-  listen 127.0.0.1:80;
+  listen 127.0.0.1:{{ nginx_default_server_port }};
   server_name localhost;
   root /var/www/localhost;
   location /nginx_status {

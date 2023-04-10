@@ -20,9 +20,9 @@
 # Default server configuration
 #
 server {
-	listen 80{% if nginx_default_server | bool %} default_server{% endif %};
+	listen {{ nginx_default_server_port }}{% if nginx_default_server | bool %} default_server{% endif %};
 {% if nginx_ipv6 is defined and nginx_ipv6 %}
-	listen [::]:80{% if nginx_default_server | bool %} default_server{% endif %};
+	listen [::]:{{ nginx_default_server_port }}{% if nginx_default_server | bool %} default_server{% endif %};
 {% endif %}
 	# SSL configuration
 	#
@@ -82,7 +82,7 @@ server {
 	#}
 }
 
-{% if nginx_default_tls is defined and nginx_default_tls | bool %}
+{% if nginx_ssl is defined and nginx_ssl | bool and nginx_default_tls is defined and nginx_default_tls | bool %}
 # Default TLS server configuration
 #
 server {

@@ -29,6 +29,7 @@ http {
         include /etc/nginx/mime.types;
         default_type application/octet-stream;
 
+{% if nginx_ssl is defined and nginx_ssl | bool %}
         ##
         # SSL Settings
         ##
@@ -37,6 +38,7 @@ http {
         ssl_ciphers {% if "TLSv1.3" in nginx_ssl_protocols %}{{ nginx_cipher_suites_tls1_3 }}{% endif %}{% if "TLSv1.2" in nginx_ssl_protocols %}:{{ nginx_cipher_suites_tls1_2 }}{% endif %};
         ssl_prefer_server_ciphers on;
         ssl_dhparam {{ nginx_dhparam_path }};
+{% endif %}
 
         ##
         # Logging Settings

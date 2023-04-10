@@ -8,12 +8,24 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Nginx Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-# https://docs.ansible.com/ansible/latest/playbook_guide/complex_data_manipulation.html
-nginxvarnames: "{{ q('varnames', '^nginx_') | sort }}"
-nginxhostvars: "{{ dict(nginxvarnames | list | zip(q('vars', *nginxvarnames))) }}"
+- name: Validate role variables
+  block:
 
-nginx_existing_sites_available: []
-nginx_existing_sites_available_filenames: []
-nginx_existing_sites_enabled: []
-nginx_existing_sites_enabled_filenames: []
+    - name: Debug the hostvars variable names that start with nginx_
+      ansible.builtin.debug:
+        var: nginxvarnames
+        verbosity: "{% if ansible_check_mode | bool %}3{% else %}4{% endif %}"
+
+    - name: Debug the hostvars variable names that start with nginx_
+      ansible.builtin.debug:
+        var: nginxhostvars
+        verbosity: "{% if ansible_check_mode | bool %}3{% else %}4{% endif %}"
+
+    - name: Check nginx_ variables using meta/argument_specs.yml
+      ansible.builtin.validate_argument_spec:
+        argument_spec: "{{ (lookup('ansible.builtin.file', 'meta/argument_specs.yml') | from_yaml)['argument_specs']['main']['options'] }}"
+        provided_arguments: "{{ nginxhostvars }}"
+
+  tags:
+    - nginx
 ...

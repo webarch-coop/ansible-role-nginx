@@ -18,6 +18,14 @@
           - nginx_tls1_3 is not defined
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
+    - name: Gather facts on listening ports
+      community.general.listen_ports_facts:
+
+    - name: Debug listening ports
+      ansible.builtin.debug:
+        var: ansible_facts.tcp_listen
+        verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+
     - name: Stat /etc/nginx
       ansible.builtin.stat:
         path: /etc/nginx
@@ -76,6 +84,8 @@
             - nginx_ca.stat.exists | bool
 
       when:
+        - nginx_ssl is defined
+        - nginx_ssl | bool
         - nginx_default_ssl_certificate is defined
         - nginx_default_ssl_certificate | length > 0
         - nginx_default_ssl_certificate_key is defined

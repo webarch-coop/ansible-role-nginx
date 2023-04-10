@@ -20,6 +20,7 @@ nginx_default_server_index:
   - index.html
   - index.nginx-debian.html
 nginx_default_server_name: "{{ inventory_hostname }}"
+nginx_default_server_port: 80
 nginx_default_ssl_certificate: "/etc/ssl/le/{{ inventory_hostname }}.fullchain.pem"
 nginx_default_ssl_certificate_key: "/etc/ssl/le/{{ inventory_hostname }}.key.pem"
 nginx_default_ssl_trusted_certificate: "/etc/ssl/le/{{ inventory_hostname }}.ca.pem"
@@ -32,7 +33,9 @@ nginx_sites_disabled:
 nginx_sites_enabled:
   - default.conf
   - localhost.conf
+nginx_ssl: true
 nginx_ssl_protocols:
   - TLSv1.2
   - TLSv1.3
+nginx_validate: true
 ...

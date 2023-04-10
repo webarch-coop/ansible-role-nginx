@@ -38,10 +38,23 @@ argument_specs:
         type: str
         required: true
         description: The default document root.
+      nginx_default_server:
+        type: bool
+        required: true
+        description: Make the default server the default one for the port.
+      nginx_default_server_index:
+        type: list
+        elements: str
+        required: true
+        description: A list of the file names to serve from a directory when the directory name is requested.
       nginx_default_server_name:
         type: str
         required: true
         description: The default domain name root.
+      nginx_default_server_port:
+        type: int
+        required: true
+        description: The default listening port.
       nginx_default_ssl_certificate:
         type: str
         required: false
@@ -62,6 +75,26 @@ argument_specs:
         type: int
         required: true
         description: The dhparam size.
+      nginx_existing_sites_available:
+        type: list
+        elements: dict
+        required: false
+        description: An internal list of existing sites available.
+      nginx_existing_sites_available_filenames:
+        type: list
+        elements: str
+        required: false
+        description: An internal list of existing sites available files.
+      nginx_existing_sites_enabled:
+        type: list
+        elements: dict
+        required: false
+        description: An internal list of existing sites enabled.
+      nginx_existing_sites_enabled_filenames:
+        type: list
+        elements: str
+        required: false
+        description: An internal list of existing sites enabled symlinks.
       nginx_packages:
         type: list
         required: true
@@ -76,12 +109,20 @@ argument_specs:
         elements: str
         required: false
         description: A list of paths of symlinks present in /etc/nginx/sites-enabled.
+      nginx_ssl:
+        type: bool
+        required: true
+        description: Enable TLS.
       nginx_ssl_protocols:
         type: list
         elements: str
         required: true
-        description: A list of SSL protocols for Nginx.
+        description: A list of TLS protocols for Nginx.
         choices:
           - TLSv1.2
           - TLSv1.3
+      nginx_validate:
+        type: bool
+        required: true
+        description: Validate role variables that start with nginx_
 ...

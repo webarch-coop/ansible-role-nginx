@@ -1,4 +1,4 @@
-# Webarchitects Ansible Nginx role 
+# Webarchitects Ansible Nginx role
 
 [![pipeline status](https://git.coop/webarch/nginx/badges/master/pipeline.svg)](https://git.coop/webarch/nginx/-/commits/master)
 
@@ -61,6 +61,10 @@ A list of file names to be used for the `index` directive, in the `default.conf`
 
 The `server_name` to use in the `default.conf` server configuration file, it defaults to `{{ inventory_hostname }}`.
 
+### nginx_default_server_port
+
+The port to use in the `default.conf` server configuration file, it defaults to `80`.
+
 ### nginx_default_ssl_certificate
 
 An optional path to a TLS certificate for the `default.conf` server configuration file, set it to an empty string to disable TLS in `default.conf`.
@@ -100,6 +104,10 @@ A list of files that are present in `/etc/nginx/sites-available` that should be 
 * `default.conf`
 * `localhost.conf`
 
+### nginx_ssl
+
+A boolean, enable TLS, `nginx_ssl` defaults to `true`.
+
 ### nginx_ssl_protocols
 
 A list of TLS protocols for [ssl_protocols](https://nginx.org/en/docs/http/ngx_http_ssl_module.html#ssl_protocols), this defaults to:
@@ -108,6 +116,10 @@ A list of TLS protocols for [ssl_protocols](https://nginx.org/en/docs/http/ngx_h
 * `TLSv1.3`
 
 This role no longer supports `TLSv1.1` or `TLSv1.0`.
+
+### nginx_validate
+
+A boolean, validate all variables strating with `nginx_` against the argument spec, `nginx_validate` defaults to `true`.
 
 ## Dependencies
 

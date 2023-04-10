@@ -11,6 +11,10 @@
 - name: Install and configure Nginx
   block:
 
+    - name: Validate Nginx variables
+      ansible.builtin.include_tasks: validate.yml
+      when: nginx_validate | bool
+
     - name: Nginx package present
       ansible.builtin.apt:
         pkg: "{{ nginx_packages }}"
@@ -30,13 +34,16 @@
     - name: Configure Nginx when /etc/nginx exists
       block:
 
-        - name: Generate DH Parameters
+        - name: Generate DH Parameters for TLS
           community.crypto.openssl_dhparam:
             path: "{{ nginx_dhparam_path }}"
             size: "{{ nginx_dhparam_size }}"
             owner: root
             group: root
             mode: 0600
+          when:
+            - nginx_ssl is defined
+            - nginx_ssl | bool
           notify: Restart nginx
 
         - name: Nginx conf in place
