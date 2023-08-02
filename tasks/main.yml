@@ -34,6 +34,10 @@
     - name: Configure Nginx when /etc/nginx exists
       block:
 
+        - name: DH Parameters for TLS to be generated
+          ansible.builtin.debug:
+            msg: "The next task, generating the DH Parameters for TLS might take some time."
+
         - name: Generate DH Parameters for TLS
           community.crypto.openssl_dhparam:
             path: "{{ nginx_dhparam_path }}"
