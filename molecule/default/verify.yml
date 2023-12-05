@@ -18,6 +18,14 @@
     ansible_python_interpreter: /usr/bin/python3
   tasks:
 
+    - name: Gather facts on listening ports
+      community.general.listen_ports_facts:
+      register: molecule_port_facts
+
+    - name: Debug Nginx listening ports
+      ansible.builtin.debug:
+        var: molecule_port_facts
+
     - name: Gather service facts
       ansible.builtin.service_facts:
       register: molecule_service_facts
@@ -37,4 +45,25 @@
         quiet: true
       vars:
         molecule_service_jpq: 'ansible_facts.services.["nginx.service"]|[0]'
+
+    - name: Write text to test file
+      ansible.builtin.lineinfile:
+        path: /var/www/html/.well-known/acme-challenge/hello_world.txt
+        line: "Hello World!"
+        state: present
+        create: true
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Check test file
+      ansible.builtin.uri:
+        url: "http://{{ ansible_default_ipv4.address }}:80/.well-known/acme-challenge/hello_world.txt"
+        return_content: true
+        status_code: 200
+      register: molecule_http_request
+
+    - name: Debug the test file content
+      ansible.builtin.debug:
+        var: molecule_http_request.content
 ...
