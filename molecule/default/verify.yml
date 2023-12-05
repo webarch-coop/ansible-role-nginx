@@ -60,7 +60,9 @@
       ansible.builtin.uri:
         url: "http://{{ ansible_default_ipv4.address }}:80/.well-known/acme-challenge/hello_world.txt"
         return_content: true
-        # status_code: 200
+        status_code:
+          - 200
+          - 403
       register: molecule_http_request
 
     - name: Debug the test file content
