@@ -46,14 +46,6 @@
       vars:
         molecule_service_jpq: 'ansible_facts.services.["nginx.service"]|[0]'
 
-    - name: Ensure that /var/www/html/.well-known/acme-challenge exists
-      ansible.builtin.file:
-        path: /var/www/html/.well-known/acme-challenge
-        state: directory
-        owner: root
-        group: root
-        mode: "0775"
-
     - name: Write text to test file
       ansible.builtin.lineinfile:
         path: /var/www/html/.well-known/acme-challenge/hello_world.txt
@@ -70,21 +62,10 @@
         return_content: true
         status_code:
           - 200
-          - 403
       register: molecule_http_request
 
     - name: Debug the test file content
       ansible.builtin.debug:
         var: molecule_http_request.content
       when: molecule_http_request.content is defined
-
-    - name: Cat the access log
-      ansible.builtin.command: cat /var/log/nginx/access.log
-      check_mode: false
-      changed_when: false
-
-    - name: Cat the error log
-      ansible.builtin.command: cat /var/log/nginx/access.log
-      check_mode: false
-      changed_when: false
 ...
