@@ -8,6 +8,13 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Nginx Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
+- name: Skip the tasks in this role
+  ansible.builtin.debug:
+    msg: "The Nginx role tasks are not being run since the nginx variable is false."
+  when: not nginx | bool
+  tags:
+    - nginx
+
 - name: Install and configure Nginx
   block:
 
@@ -20,6 +27,7 @@
         pkg: "{{ nginx_packages }}"
         state: present
         update_cache: false
+      notify: Restart nginx
       when:
         - nginx_packages is defined
         - nginx_packages != []
@@ -34,21 +42,25 @@
     - name: Configure Nginx when /etc/nginx exists
       block:
 
-        - name: DH Parameters for TLS to be generated
-          ansible.builtin.debug:
-            msg: "The next task, generating the DH Parameters for TLS might take some time."
+        - name: DH parameter tasks
+          block:
 
-        - name: Generate DH Parameters for TLS
-          community.crypto.openssl_dhparam:
-            path: "{{ nginx_dhparam_path }}"
-            size: "{{ nginx_dhparam_size }}"
-            owner: root
-            group: root
-            mode: 0600
+            - name: DH parameters for TLS to be generated
+              ansible.builtin.debug:
+                msg: "The next task, generating the DH Parameters for TLS might take some time."
+
+            - name: Generate DH Parameters for TLS
+              community.crypto.openssl_dhparam:
+                path: "{{ nginx_dhparam_path }}"
+                size: "{{ nginx_dhparam_size }}"
+                owner: root
+                group: root
+                mode: "0600"
+              notify: Restart nginx
+
           when:
             - nginx_ssl is defined
             - nginx_ssl | bool
-          notify: Restart nginx
 
         - name: Nginx conf in place
           ansible.builtin.template:
@@ -56,7 +68,7 @@
             dest: /etc/nginx/nginx.conf
             owner: root
             group: root
-            mode: 0644
+            mode: "0644"
           notify: Restart nginx
 
         - name: Nginx default.conf sites-available present
@@ -65,7 +77,7 @@
             dest: /etc/nginx/sites-available/default.conf
             owner: root
             group: root
-            mode: 0644
+            mode: "0644"
           notify: Restart nginx
 
         - name: Nginx localhost.conf sites-available present
@@ -74,7 +86,7 @@
             dest: /etc/nginx/sites-available/localhost.conf
             owner: root
             group: root
-            mode: 0644
+            mode: "0644"
           notify: Restart nginx
 
         - name: Include site checks

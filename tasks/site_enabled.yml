@@ -27,7 +27,7 @@
         src: "/etc/nginx/sites-available/{{ nginx_site }}"
         state: link
         follow: false
-        mode: 0777
+        mode: "0777"
         owner: root
         group: root
       notify: Restart nginx
