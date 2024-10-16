@@ -34,7 +34,7 @@
     - name: Set a variable to incidate that IPv6 is enabled
       ansible.builtin.set_fact:
         nginx_ipv6: true
-      when: ansible_default_ipv6 | length > 0
+      when: ansible_facts.default_ipv6 | length > 0
 
     - name: Check TLS certificates
       block:
