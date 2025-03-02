@@ -10,7 +10,7 @@ server {
     deny all;
   }
 {% if munin_phpfpm is defined and munin_phpfpm %}
-{% if munin_phpfpm_socket is defined and munin_phpfpm_socket %}      
+{% if munin_phpfpm_socket is defined and munin_phpfpm_socket %}
   location ~ ^/(status|ping)$ {
     include fastcgi.conf;
     fastcgi_pass unix:{{ munin_phpfpm_socket }};
@@ -21,7 +21,7 @@ server {
     deny all;
   }
 {% endif %}
-{% if munin_opcache is defined and munin_opcache %}      
+{% if munin_opcache is defined and munin_opcache %}
   location ~ \.php$ {
     include fastcgi.conf;
     fastcgi_intercept_errors on;

@@ -26,7 +26,8 @@
       ansible.builtin.apt:
         pkg: "{{ nginx_packages }}"
         state: present
-        update_cache: false
+        update_cache: true
+        cache_valid_time: 120
       notify: Restart nginx
       when:
         - nginx_packages is defined
