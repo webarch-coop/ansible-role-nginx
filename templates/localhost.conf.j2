@@ -9,8 +9,8 @@ server {
     allow 127.0.0.1;
     deny all;
   }
-{% if munin_phpfpm is defined and munin_phpfpm %}
-{% if munin_phpfpm_socket is defined and munin_phpfpm_socket %}
+{% if munin_phpfpm is defined and munin_phpfpm | bool %}
+{%     if munin_phpfpm_socket is defined and munin_phpfpm_socket | bool %}
   location ~ ^/(status|ping)$ {
     include fastcgi.conf;
     fastcgi_pass unix:{{ munin_phpfpm_socket }};
@@ -20,8 +20,8 @@ server {
     allow 127.0.0.1;
     deny all;
   }
-{% endif %}
-{% if munin_opcache is defined and munin_opcache %}
+{%     endif %}
+{%     if munin_opcache is defined and munin_opcache | bool %}
   location ~ \.php$ {
     include fastcgi.conf;
     fastcgi_intercept_errors on;
@@ -30,7 +30,7 @@ server {
     allow 127.0.0.1;
     deny all;
   }
-{% endif %}
+{%     endif %}
 {% endif %}
 }
-# vim: syntax=nginx
+# vim: syntax=nginx{# vim: syntax=jinja2 #}
