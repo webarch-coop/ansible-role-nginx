@@ -78,6 +78,7 @@
             owner: root
             group: root
             mode: "0644"
+            backup: true
           notify: Restart nginx
 
         - name: Nginx default.conf sites-available present
@@ -87,6 +88,7 @@
             owner: root
             group: root
             mode: "0644"
+            backup: true
           notify: Restart nginx
 
         - name: Nginx localhost.conf sites-available present
@@ -96,6 +98,7 @@
             owner: root
             group: root
             mode: "0644"
+            backup: true
           notify: Restart nginx
 
         - name: Include site checks
