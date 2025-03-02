@@ -113,19 +113,6 @@ server {
         ssl_certificate {{ nginx_default_ssl_certificate }};
         ssl_certificate_key {{ nginx_default_ssl_certificate_key }};
         ssl_trusted_certificate {{ nginx_default_ssl_trusted_certificate }};
-{%     if "TLSv1.2" in nginx_ssl_protocols and "TLSv1.3" in nginx_ssl_protocols %}
-        ssl_ciphers {{ nginx_cipher_suites_tls1_3 }}:{{ nginx_cipher_suites_tls1_2 }};
-{%     elif "TLSv1.3" in nginx_ssl_protocols %}
-        ssl_ciphers {{ nginx_cipher_suites_tls1_3 }};
-{%     endif %};
-        ssl_session_timeout 1d;
-        ssl_session_cache shared:MozSSL:10m;  # about 40000 sessions
-        ssl_session_tickets off;
-        ssl_protocols {{ nginx_ssl_protocols | join(' ') }};
-        ssl_prefer_server_ciphers off;
-        add_header Strict-Transport-Security "max-age=63072000" always;
-        ssl_stapling on;
-        ssl_stapling_verify on;
 {%     if nginx_default_server_name is defined %}
         server_name {{ nginx_default_server_name }};
 {%     else %}
